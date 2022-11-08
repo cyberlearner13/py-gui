@@ -5,7 +5,7 @@ from tkinter import RIGHT, END, DISABLED, NORMAL
 root = tkinter.Tk()
 root.title('Calculator')
 root.iconbitmap('calc.ico')
-root.geometry('400x400')
+root.geometry('300x400')
 root.resizable(0,0)
 
 #Define colors and fonts
