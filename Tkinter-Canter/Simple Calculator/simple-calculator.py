@@ -15,6 +15,111 @@ white_green = '#edefe0'
 button_font = ('Arial', 18)
 display_font = ('Arial', 30)
 
+#Define functions
+def submit_number(number):
+    """Add a number or a decimal to the display."""
+    #Insert the number or the decimal pressed to the display
+    display.insert(END, number)
+
+    #Disable decimal button --- if pressed
+    if '.' in display.get():
+        decimal_button.config(state=DISABLED)
+
+
+def operate(operator):
+    """Store the first number of the expression and the operation to be used"""
+    global first_number
+    global operation
+
+    #Get op. pressed and current val of display--first number
+    operation = operator
+    first_number = display.get()
+
+    #Delete first num from entry
+    display.delete(0, END)
+
+    #Disable all ops until = or clear is pressed
+    add_button.config(state=DISABLED)
+    subtract_button.config(state=DISABLED)
+    multiply_button.config(state=DISABLED)
+    divide_button.config(state=DISABLED)
+    inverse_button.config(state=DISABLED)
+    square_button.config(state=DISABLED)
+    exponent_button.config(state=DISABLED)
+
+    #Re-enable decimal buttons
+    decimal_button.config(state=NORMAL)
+
+def equal():
+    """Run the stored operation for two numbers"""
+    #Perform the desired math
+    if operation == 'add':
+        value = float(first_number) + float(display.get())
+    elif operation == 'subtract':
+        value = float(first_number) - float(display.get())
+    elif operation == 'multiply':
+        value = float(first_number) * float(display.get())
+    elif operation == 'divide':
+        if display.get() == '0':
+            value = 'ERROR'
+        else:
+            value = float(first_number) / float(display.get())
+    elif operation == 'exponent':
+        value = float(first_number) ** float(display.get())
+
+    #Remove current value and update with answer
+    display.delete(0, END)
+    display.insert(0, value)
+
+    #Return buttons to normal states
+    enable_buttons()
+
+def enable_buttons():
+    """Enables all buttons on the calculator"""
+    decimal_button.config(state=NORMAL)
+    add_button.config(state=NORMAL)
+    subtract_button.config(state=NORMAL)
+    multiply_button.config(state=NORMAL)
+    divide_button.config(state=NORMAL)
+    inverse_button.config(state=NORMAL)
+    square_button.config(state=NORMAL)
+    exponent_button.config(state=NORMAL)
+
+def inverse():
+    """Inverts the displayed number"""
+
+    #Divide by zero check
+    if display.get() == '0':
+        value = 'ERROR'
+    else: 
+        value = 1/float(display.get())
+
+    display.delete(0, END)
+    display.insert(0, value)
+
+def square():
+    """Squares the displayed number"""
+    value = float(display.get()) ** 2
+    display.delete(0, END)
+    display.insert(0, value)
+    
+
+def clear():
+    """Clears display"""
+    display.delete(0, END)
+    enable_buttons()
+
+def negate():
+    """Negates the value"""
+    if display.get() == '0':
+        value = '0'
+    else:
+        value =  -1 * float(display.get())
+
+    display.delete(0, END)
+    display.insert(0, value)
+
+
 #GUI Layout
 #Define frames
 display_frame = tkinter.LabelFrame(root)
@@ -28,32 +133,49 @@ borderwidth=5, justify=RIGHT)
 display.pack(padx=5, pady=5)
 
 #Layout for the button frame
-clear_button = tkinter.Button(button_frame, text="Clear", font=button_font, bg=dark_green)
+clear_button = tkinter.Button(button_frame, text="Clear", font=button_font, bg=dark_green, command=clear)
 quit_button = tkinter.Button(button_frame, text="Quit", font=button_font, bg=dark_green, command=root.destroy)
 
-inverse_button = tkinter.Button(button_frame, text='1/x', font=button_font, bg=light_green)
-square_button = tkinter.Button(button_frame, text='x^2', font=button_font, bg=light_green)
-exponent_button = tkinter.Button(button_frame, text='x^n', font=button_font, bg=light_green)
-divide_button = tkinter.Button(button_frame, text=' / ', font=button_font, bg=light_green)
+inverse_button = tkinter.Button(button_frame, text='1/x', font=button_font, bg=light_green, command=inverse)
+square_button = tkinter.Button(button_frame, text='x^2', font=button_font, bg=light_green, command=square)
+exponent_button = tkinter.Button(button_frame, text='x^n', font=button_font, bg=light_green,
+            command=lambda:operate('exponent'))
 
-multiply_button = tkinter.Button(button_frame, text='*', font=button_font, bg=light_green)
-subtract_button = tkinter.Button(button_frame, text='-', font=button_font, bg=light_green)
-add_button = tkinter.Button(button_frame, text='+', font=button_font, bg=light_green)
-equal_button = tkinter.Button(button_frame, text='=', font=button_font, bg=dark_green)
+divide_button = tkinter.Button(button_frame, text=' / ', font=button_font, bg=light_green
+                ,command=lambda:operate('divide'))
+multiply_button = tkinter.Button(button_frame, text='*', font=button_font, bg=light_green
+                ,command=lambda:operate('multiply'))
+subtract_button = tkinter.Button(button_frame, text='-', font=button_font, bg=light_green
+                ,command=lambda:operate('subtract'))
+add_button = tkinter.Button(button_frame, text='+', font=button_font, bg=light_green
+                ,command=lambda:operate('add'))
 
-decimal_button = tkinter.Button(button_frame, text='.', font=button_font, bg='black', fg='white')
-negate_button = tkinter.Button(button_frame, text='+/-', font=button_font, bg='black', fg='white') 
+equal_button = tkinter.Button(button_frame, text='=', font=button_font, bg=dark_green,
+                command=equal)
 
-nine_button = tkinter.Button(button_frame, text='9', font=button_font, bg='black', fg='white')
-eight_button = tkinter.Button(button_frame, text='8', font=button_font, bg='black', fg='white')
-seven_button = tkinter.Button(button_frame, text='7', font=button_font, bg='black', fg='white')
-six_button = tkinter.Button(button_frame, text='6', font=button_font, bg='black', fg='white')
-five_button = tkinter.Button(button_frame, text='5', font=button_font, bg='black', fg='white')
-four_button = tkinter.Button(button_frame, text='4', font=button_font, bg='black', fg='white')
-three_button = tkinter.Button(button_frame, text='3', font=button_font, bg='black', fg='white')
-two_button = tkinter.Button(button_frame, text='2', font=button_font, bg='black', fg='white')
-one_button = tkinter.Button(button_frame, text='1', font=button_font, bg='black', fg='white')
-zero_button = tkinter.Button(button_frame, text='0', font=button_font, bg='black', fg='white') 
+decimal_button = tkinter.Button(button_frame, text='.', font=button_font, bg='black', fg='white',              command=lambda:submit_number('.'))
+negate_button = tkinter.Button(button_frame, text='+/-', font=button_font, bg='black', fg='white', command=negate) 
+
+nine_button = tkinter.Button(button_frame, text='9', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(9))
+eight_button = tkinter.Button(button_frame, text='8', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(8))
+seven_button = tkinter.Button(button_frame, text='7', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(7))
+six_button = tkinter.Button(button_frame, text='6', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(6))
+five_button = tkinter.Button(button_frame, text='5', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(5))
+four_button = tkinter.Button(button_frame, text='4', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(4))
+three_button = tkinter.Button(button_frame, text='3', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(3))
+two_button = tkinter.Button(button_frame, text='2', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(2))
+one_button = tkinter.Button(button_frame, text='1', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(1))
+zero_button = tkinter.Button(button_frame, text='0', font=button_font, bg='black', fg='white',
+                command=lambda:submit_number(0)) 
 
 
 #First row
